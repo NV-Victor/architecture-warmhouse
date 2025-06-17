@@ -1,0 +1,11 @@
+@startuml
+title Запрос PUT /api/v1/sensors/:id для обновления датчика
+
+actor "Специалист компании Тёплый дом" as User
+participant "SmartHome" as App
+
+User -> App : PUT /api/v1/sensors/:id
+App -> App : Обновление записи датчика
+App --> User : Ответ 200 OK
+
+@enduml

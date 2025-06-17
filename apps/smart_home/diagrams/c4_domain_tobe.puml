@@ -1,0 +1,46 @@
+@startuml
+
+skinparam packageStyle rectangle
+
+skinparam package {
+  FontColor white
+  BorderStyle solid
+  BorderColor blue
+}
+
+skinparam rectangle {
+  BorderColor black
+  BorderStyle dashed
+}
+
+title Domain Map — Тёплый дом - To Be
+
+rectangle "Умный дом\n[Enterprise]" {
+      rectangle "Domain: Управление подписками\n[System]" {
+        rectangle "«Subdomain: Обработка платежей\n[System]"{
+          package "«system»\nContext: Журнал транзакций" #CornflowerBlue{}
+          package "«system»\nContext: Управление платежами" #CornflowerBlue{}
+        }
+        rectangle "«Subdomain: Управление сценариями\n[System]"{
+          package "«system»\nContext: Управление аккаунтами" #CornflowerBlue{}
+        }
+    }
+    rectangle "Domain: Удаленное управление\n[System]" {
+        rectangle "«Subdomain: Управление телеметрией\n[System]"{
+          package "«system»\nContext: Визуализация и уведомления" #CornflowerBlue{}
+          package "«system»\nContext: Хранение и агрегация" #CornflowerBlue{}
+        }
+        rectangle "«Subdomain: Управление сценариями\n[System]"{
+          package "«system»\nContext: Исполнение сценариев" #CornflowerBlue{}
+          package "«system»\nContext: Создание сценариев" #CornflowerBlue{}
+        }
+        rectangle "«Subdomain: Управление устройствами\n[System]"{
+          package "«system»\nContext: Мониторинг состояния" #CornflowerBlue {}
+          package "«system»\nContext: Регулирование состояния" #CornflowerBlue{}
+          package "«system»\nContext: Управление датчиками" #CornflowerBlue{}
+        }
+        package "«system»\nContext: Интеграция с устройствами" #CornflowerBlue {}
+    }
+}
+
+@enduml

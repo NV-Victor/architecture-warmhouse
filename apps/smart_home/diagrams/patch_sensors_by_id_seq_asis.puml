@@ -1,0 +1,11 @@
+@startuml
+title PATCH /api/v1/sensors/:id/value — обновление датчика (тепература и/или статус)
+
+actor "Пользователь" as User
+participant "SmartHome" as App
+
+User -> App : PATCH /api/v1/sensors/:id/value
+App -> App : Обновить значение и статус датчика по ID
+App --> User : Ответ 200 OK
+
+@enduml

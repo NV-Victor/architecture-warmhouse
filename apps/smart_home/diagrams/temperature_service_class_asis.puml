@@ -1,0 +1,32 @@
+@startuml
+
+title TemperatureService class diagram AS-IS
+top to bottom direction
+
+package "services" {
+  class TemperatureService {
+    - BaseURL: string
+    - HTTPClient: *http.Client
+    + GetTemperature(location: string): *TemperatureResponse
+    + GetTemperatureByID(sensorID: string): *TemperatureResponse
+  }
+
+  class TemperatureServiceFactory {
+    + NewTemperatureService(baseURL: string): *TemperatureService
+  }
+
+  class TemperatureResponse {
+    + Value: float64
+    + Unit: string
+    + Timestamp: time.Time
+    + Location: string
+    + Status: string
+    + SensorID: string
+    + SensorType: string
+    + Description: string
+  }
+}
+
+services.TemperatureService --> services.TemperatureResponse : returns
+
+@enduml

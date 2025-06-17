@@ -1,0 +1,31 @@
+@startuml
+!include ./C4-PlantUML-Git/C4_Component.puml
+
+
+title Integration Adapter Container Diagram — Тёплый дом - To Be
+
+System_Boundary(SmartHomeSystem, "SmartHome System") {
+
+    Container(IntegrationAdapter, "Integration Adapter", "Go", "Интеграция с внешними устройствами по стандартным протоколам"){
+      Component(MQTTClientController, "MQTTClientController", "", "Отправка и приём сообщений через MQTT")
+      Component(HTTPClientController, "HTTPClientController", "", "Вызовы HTTP-устройств")
+      Component(DeviceTranslator, "DeviceTranslator", "", "Преобразование универсальных команд в формат конкретного устройства")
+      Component(ProtocolRouter, "ProtocolRouter", "", "Определяет по типу устройства нужный способ взаимодействия")
+
+      Rel(DeviceTranslator, MQTTClientController, "Публикует команды", "function call")
+      Rel(DeviceTranslator, HTTPClientController, "Отправляет команды", "function call")
+      Rel(ProtocolRouter, DeviceTranslator, "Передаёт команды на трансляцию", "function call")
+  }
+
+  Container(DeviceService, "Device Service", "Go", "Управление состоянием устройств")
+'  Container(ScenarioService, "Scenario Service", "", "Создание и исполнение сценариев")
+  System_Ext(DeviceAPI, "Device API", "API внешних устройств")
+
+  Rel(DeviceService, ProtocolRouter, "POST команда управления", "HTTP")
+'  Rel(ScenarioService, ProtocolRouter, "Команды от сценариев", "")
+  Rel(MQTTClientController, DeviceAPI, "Публикует события устройств", "MQTT")
+  Rel(HTTPClientController, DeviceAPI, "Отправляет события устройств", "HTTP")
+
+}
+
+@enduml

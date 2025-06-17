@@ -1,0 +1,28 @@
+@startuml
+
+!include ./C4-PlantUML-Git/C4_Component.puml
+
+title Web Application Container Diagram — Тёплый дом - To Be
+
+System_Boundary(SmartHomeSystem, "SmartHome System") {
+    Container(WebApp, "Web Application", "", "Интерфейс для управления умным домом"){
+'      Component(AuthController, "AuthController", "", "Обрабатывает аутентификацию и авторизацию")
+      Component(DeviceServiceController, "DeviceServiceController", "", "Управление устройствами")
+'      Component(ScenarioServiceController, "ScenarioServiceController", "", "Управляет сценариями")
+'      Component(TelemetryServiceController, "TelemetryServiceController", "", "Просматривает телеметрию")
+'      Component(SubscriptionServiceController, "SubscriptionServiceController", "", "Управляет аккаунтом пользователя")    
+'       Component(PaymentController, "PaymentController", "", "Управляет платежами")
+    }
+
+
+  Container(APIGateway, "API Gateway", "Nginx", "Маршрутизация запросов к нужным сервисам")
+
+'  Rel(AuthController, APIGateway, "", "")
+  Rel(DeviceServiceController, APIGateway, "/api/v1/devices", "HTTP")
+'  Rel(ScenarioServiceController, APIGateway, "", "")
+'  Rel(TelemetryServiceController, APIGateway, "", "")
+'  Rel(SubscriptionServiceController, APIGateway, "", "")
+'  Rel(PaymentController, APIGateway, "", "")
+}
+
+@enduml

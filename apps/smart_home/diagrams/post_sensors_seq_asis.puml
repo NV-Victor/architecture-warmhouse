@@ -1,0 +1,11 @@
+@startuml
+title Запрос POST /api/v1/sensors для создания датчика
+
+actor "Специалист компании Тёплый дом" as User
+participant "SmartHome" as App
+
+User -> App : POST /api/v1/sensors
+App -> App : Создание записи датчика
+App --> User : Ответ 201 Created
+
+@enduml

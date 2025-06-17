@@ -1,0 +1,206 @@
+openapi: 3.0.3
+info:
+  title: Device Service API
+  version: "1.0"
+  description: API для управления устройствами умного дома (освещение, отопление, ворота, камеры и др.)
+
+servers:
+  - url: /api/v1
+
+tags:
+  - name: Devices
+    description: Управление устройствами
+
+paths:
+  /devices:
+    get:
+      summary: Получить список всех устройств
+      tags: [Devices]
+      responses:
+        '200':
+          description: Список устройств
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Device'
+    post:
+      summary: Добавить новое устройство
+      tags: [Devices]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewDevice'
+      responses:
+        '201':
+          description: Устройство успешно создано
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+
+  /devices/{id}:
+    get:
+      summary: Получить устройство по ID
+      tags: [Devices]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Информация об устройстве
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+    put:
+      summary: Обновить устройство
+      tags: [Devices]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDevice'
+      responses:
+        '200':
+          description: Устройство обновлено
+    delete:
+      summary: Удалить устройство
+      tags: [Devices]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Устройство удалено
+
+  /devices/{id}/value:
+    patch:
+      summary: Обновить значение и/или статус устройства
+      tags: [Devices]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                value:
+                  type: number
+                status:
+                  type: string
+              required: [value, status]
+      responses:
+        '200':
+          description: Значение обновлено
+
+  /devices/{location}:
+    get:
+      summary: Получить актуальный статус устройства по его местоположению
+      tags: [Devices]
+      parameters:
+        - in: path
+          name: location
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Данные о статусе устройства
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceStatus'
+
+components:
+  schemas:
+    Device:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        type:
+          type: string
+          enum: [temperature, light, gate, camera, sensor, other]
+        location:
+          type: string
+        value:
+          type: number
+        unit:
+          type: string
+        status:
+          type: string
+          enum: [active, inactive, open, closed, on, off, error]
+        last_updated:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+
+    NewDevice:
+      type: object
+      required: [name, type, location]
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+          enum: [temperature, light, gate, camera, sensor, other]
+        location:
+          type: string
+        unit:
+          type: string
+
+    UpdateDevice:
+      type: object
+      properties:
+        name:
+          type: string
+        location:
+          type: string
+        status:
+          type: string
+        unit:
+          type: string
+
+    DeviceStatus:
+      type: object
+      properties:
+        value:
+          type: number
+        status:
+          type: string
+        unit:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        location:
+          type: string
+        type:
+          type: string

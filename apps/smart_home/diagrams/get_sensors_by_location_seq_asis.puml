@@ -1,0 +1,13 @@
+@startuml
+title Запрос GET /api/v1/sensors/:location для просмотра информации по датчику
+
+actor "Пользователь" as User
+participant "SmartHome" as App
+participant "Sensor (внешний API)" as ExternalSensor
+
+User -> App : GET /api/v1/sensors/temperature/:location
+App -> ExternalSensor : GET /temperature/:location
+ExternalSensor --> App : Актуальное состояние и температура по датчику
+App --> User : Ответ 200 OK с актуальным состоянием датчика
+
+@enduml

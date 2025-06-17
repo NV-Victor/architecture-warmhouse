@@ -1,0 +1,76 @@
+@startuml
+
+!include ./C4-PlantUML-Git/C4_Component.puml
+
+title Container Diagram - Тёплый дом
+
+Person(User, "Пользователь", "Пользователь, использующий сервисы SmartHome")
+Person(Admin, "Администратор", "Сотрудник компании Тёплый дом, управляющий системой SmartHome")
+System(SmartHomeSystem, "SmartHome System", "Система, управляющая удаленными устройствами умного дома")
+
+
+Container_Boundary(SmartHomeSystem, "SmartHome System") {
+  Container(WebApp, "Web Application", "React", "Интерфейс для управления умным домом")
+  Container(APIGateway, "API Gateway", "Nginx", "Маршрутизация запросов к нужным сервисам")
+  Container(DeviceService, "Device Service", "Go", "Управление состоянием устройств")
+  Container(ScenarioService, "Scenario Service", "", "Создание и исполнение сценариев")
+  Container(TelemetryService, "Telemetry Service", "", "Сбор и отображение телеметрии")
+  Container(SubscriptionService, "Subscription Service", "", "Управление пользователями и подписками")
+  Container(PaymentService, "Payment Service", "", "Обработка платежей за подписку и журнал транзакций")
+  Container(IntegrationAdapter, "Integration Adapter", "Go", "Интеграция с внешними устройствами по стандартным протоколам")
+  Container(EventBroker, "Event Broker", "Kafka", "Передача событий между сервисами")
+  Container(Database, "Database", "PostgreSQL", "Централизованное хранилище данных")
+  Container(SmartHomeMainApp, "SmartHome Main App", "Go", "Текущее монолитное приложение SmartHome для отопления")
+}
+
+System_Ext(DeviceAPI, "Device API", "API внешних устройств")
+System_Ext(Bank, "Bank System", "API банка для проведения платежей")
+
+'Взаимодействие пользователей
+Rel(User, WebApp, "Использование")
+Rel(Admin, WebApp,"Администрирование")
+
+'Взаимодействие WebApp
+Rel(WebApp, APIGateway,"Отправка запросов")
+
+'Взаимодействие APIGateway
+Rel(APIGateway, DeviceService,"Управление устройствами")
+Rel(APIGateway, ScenarioService,"Управление сценариями")
+Rel(APIGateway, TelemetryService,"Просмотр телеметрии")
+Rel(APIGateway, SubscriptionService,"Управление пользователями и подписками")
+Rel(APIGateway, PaymentService,"Оплата подписок")
+Rel(APIGateway, SmartHomeMainApp,"Оплата подписок")
+
+'Взаимодействие DeviceService
+Rel(DeviceService,Database,"Хранение данные об устройствах")
+Rel(DeviceService,IntegrationAdapter,"Управление внешними устройствами")
+Rel(DeviceService,EventBroker,"Публикует события для телеметрии и сценариев")
+
+'Взаимодействие ScenarioService
+Rel(ScenarioService,Database,"Хранение и получение сценариев")
+Rel(ScenarioService,EventBroker,"Получение событий", "sub")
+Rel(ScenarioService,IntegrationAdapter,"Управление устройствами по сценарию")
+
+'Взаимодействие TelemetryService
+Rel(TelemetryService,EventBroker, "Получение событий", "sub")
+
+'Взаимодействие IntegrationAdapter
+Rel(IntegrationAdapter,DeviceAPI,"Маршрутизация команд на внешние устройства")
+Rel(IntegrationAdapter,EventBroker,"Публикует события для телеметрии и сценариев")
+
+'Взаимодействие SubscriptionService
+Rel(SubscriptionService,Database,"Хранение данных пользователей и подписок")
+
+'Взаимодействие PaymentService
+Rel(PaymentService,Database,"Хранение транзакций")
+Rel(PaymentService,SubscriptionService,"Уведомление о платежах")
+Rel(PaymentService,Bank,"Обработка платежей")
+
+'Взаимодействие SmartHomeMainApp
+Rel(SmartHomeMainApp,Database,"Хранение данных устройств")
+Rel(SmartHomeMainApp,DeviceAPI,"Управление устройствами отопления")
+
+'Взаимодействие DeviceAPI
+Rel(DeviceAPI,IntegrationAdapter,"Получение информации от внешних устройств")
+
+@enduml

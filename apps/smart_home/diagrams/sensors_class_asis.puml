@@ -1,0 +1,43 @@
+@startuml
+
+title SensorHandler class diagram AS-IS
+top to bottom direction
+
+package "handlers" {
+  class SensorHandler {
+    - DB: *db.DB
+    - TemperatureService: *services.TemperatureService
+    + RegisterRoutes(router: *gin.RouterGroup)
+    + GetSensors(c: *gin.Context)
+    + GetSensorByID(c: *gin.Context)
+    + GetTemperatureByLocation(c: *gin.Context)
+    + CreateSensor(c: *gin.Context)
+    + UpdateSensor(c: *gin.Context)
+    + DeleteSensor(c: *gin.Context)
+    + UpdateSensorValue(c: *gin.Context)
+  }
+}
+
+package "db" {
+  class DB {
+    + GetSensors(ctx: context.Context): []Sensor
+    + GetSensorByID(ctx: context.Context, id: int): Sensor
+    + CreateSensor(ctx: context.Context, sensorCreate: SensorCreate): Sensor
+    + UpdateSensor(ctx: context.Context, id: int, sensorUpdate: SensorUpdate): Sensor
+    + DeleteSensor(ctx: context.Context, id: int): error
+    + UpdateSensorValue(ctx: context.Context, id: int, value: float64, status: string): error
+  }
+}
+
+package "services" {
+  class TemperatureService {
+    + GetTemperatureByID(sensorID: string): TemperatureResponse
+    + GetTemperature(location: string): TemperatureResponse
+  }
+}
+
+handlers.SensorHandler --> db.DB : uses
+handlers.SensorHandler --> services.TemperatureService : uses
+
+@enduml
+

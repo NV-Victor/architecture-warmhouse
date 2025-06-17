@@ -1,0 +1,54 @@
+@startuml
+
+title Database class diagram AS-IS
+top to bottom direction
+
+package db {
+  class DB {
+    - Pool: *pgxpool.Pool
+    + New(connString: string): *DB
+    + Close()
+    + GetSensors(ctx: context.Context): []Sensor
+    + GetSensorByID(ctx: context.Context, id: int): Sensor
+    + CreateSensor(ctx: context.Context, s: SensorCreate): Sensor
+    + UpdateSensor(ctx: context.Context, id: int, s: SensorUpdate): Sensor
+    + DeleteSensor(ctx: context.Context, id: int): error
+    + UpdateSensorValue(ctx: context.Context, id: int, value: float64, status: string): error
+  }
+}
+
+package models {
+  class Sensor {
+    + ID: int
+    + Name: string
+    + Type: string
+    + Location: string
+    + Value: float64
+    + Unit: string
+    + Status: string
+    + LastUpdated: time.Time
+    + CreatedAt: time.Time
+  }
+
+  class SensorCreate {
+    + Name: string
+    + Type: string
+    + Location: string
+    + Unit: string
+  }
+
+  class SensorUpdate {
+    + Name: string
+    + Type: string
+    + Location: string
+    + Value: *float64
+    + Unit: string
+    + Status: string
+  }
+}
+
+DB --> Sensor : returns/uses
+DB --> SensorCreate : uses for creation
+DB --> SensorUpdate : uses for update
+
+@enduml

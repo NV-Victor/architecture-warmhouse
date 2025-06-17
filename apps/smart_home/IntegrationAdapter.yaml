@@ -1,0 +1,85 @@
+openapi: 3.0.3
+info:
+  title: Integration Adapter API
+  version: "1.0.0"
+  description: |
+    API для получения данных с устройств умного дома: температура, свет, ворота, камеры и др.
+
+servers:
+  - url: /api/v1
+
+paths:
+  /devices/{deviceType}/{deviceId}:
+    get:
+      summary: Получить данные устройства по ID
+      parameters:
+        - in: path
+          name: deviceType
+          required: true
+          description: Тип устройства (например, temperature, light, gate, camera)
+          schema:
+            type: string
+        - in: path
+          name: deviceId
+          required: true
+          description: Уникальный идентификатор устройства
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Данные устройства
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceResponse'
+        '404':
+          description: Устройство не найдено
+
+  /devices/{deviceType}:
+    get:
+      summary: Получить данные устройства по локации
+      parameters:
+        - in: path
+          name: deviceType
+          required: true
+          description: Тип устройства
+          schema:
+            type: string
+        - in: query
+          name: location
+          required: true
+          description: Локация, к которой привязано устройство
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Данные устройства
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceResponse'
+        '404':
+          description: Устройство не найдено
+
+components:
+  schemas:
+    DeviceResponse:
+      type: object
+      properties:
+        sensor_id:
+          type: string
+        sensor_type:
+          type: string
+        value:
+          type: number
+        unit:
+          type: string
+        status:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        location:
+          type: string
+        description:
+          type: string

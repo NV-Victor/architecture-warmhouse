@@ -1,0 +1,20 @@
+@startuml
+
+title SmartHome ER diagram AS-IS
+
+top to bottom direction
+
+entity sensors {
+  * id : SERIAL
+  --
+  * name : VARCHAR(100)
+  * type : VARCHAR(50)
+  * location : VARCHAR(100)
+  value : FLOAT = 0
+  unit : VARCHAR(20)
+  * status : VARCHAR(20) = 'inactive'
+  * last_updated : TIMESTAMP WITH TIME ZONE = NOW()
+  * created_at : TIMESTAMP WITH TIME ZONE = NOW()
+}
+
+@enduml

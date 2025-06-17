@@ -1,0 +1,78 @@
+@startuml
+title Device Service Code Diagram — Тёплый дом - To Be
+
+package "device-service" {
+
+  class DeviceHandler {
+    - DB: *DB
+    - ExternalService: *ExternalDeviceService
+    + RegisterRoutes(router: *gin.RouterGroup)
+    + GetDevices(c: *gin.Context)
+    + GetDeviceByID(c: *gin.Context)
+    + CreateDevice(c: *gin.Context)
+    + UpdateDevice(c: *gin.Context)
+    + DeleteDevice(c: *gin.Context)
+    + UpdateDeviceState(c: *gin.Context)
+    + GetDeviceDataByLocation(c: *gin.Context)
+  }
+
+  class DB {
+    + GetDevices(ctx: context.Context): []Device
+    + GetDeviceByID(ctx: context.Context, id: int): Device
+    + CreateDevice(ctx: context.Context, deviceCreate: DeviceCreate): Device
+    + UpdateDevice(ctx: context.Context, id: int, deviceUpdate: DeviceUpdate): Device
+    + DeleteDevice(ctx: context.Context, id: int): error
+    + UpdateDeviceState(ctx: context.Context, id: int, value: any, status: string): error
+  }
+
+  class ExternalDeviceService {
+    + GetDeviceDataByID(deviceID: string): *DeviceDataResponse
+    + GetDeviceDataByLocation(location: string): *DeviceDataResponse
+  }
+
+  class Device {
+    + ID: int
+    + Name: string
+    + Type: string
+    + Location: string
+    + Value: any
+    + Unit: string
+    + Status: string
+    + LastUpdated: time.Time
+    + CreatedAt: time.Time
+  }
+
+  class DeviceCreate {
+    + Name: string
+    + Type: string
+    + Location: string
+    + Unit: string
+  }
+
+  class DeviceUpdate {
+    + Name: string
+    + Location: string
+    + Unit: string
+  }
+
+  class DeviceDataResponse {
+    + Value: any
+    + Unit: string
+    + Timestamp: time.Time
+    + Location: string
+    + Status: string
+    + DeviceID: string
+    + DeviceType: string
+    + Description: string
+  }
+
+  ' Связи
+  DeviceHandler --> DB : uses
+  DeviceHandler --> ExternalDeviceService : uses
+  DB --> Device
+  DB --> DeviceCreate
+  DB --> DeviceUpdate
+  ExternalDeviceService --> DeviceDataResponse
+}
+
+@enduml

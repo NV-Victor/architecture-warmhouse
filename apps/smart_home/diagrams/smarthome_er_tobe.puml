@@ -1,0 +1,30 @@
+@startuml
+title SmartHome ER diagram TO-BE
+
+top to bottom direction
+
+entity devices {
+  * id : SERIAL
+  --
+  * name : VARCHAR(100)
+  * type : VARCHAR(50)
+  * location : VARCHAR(100)
+  * external_user_id : UUID
+  * status : VARCHAR(20) = 'inactive'
+  * last_updated : TIMESTAMP WITH TIME ZONE = NOW()
+  * created_at : TIMESTAMP WITH TIME ZONE = NOW()
+}
+
+entity device_measurements {
+  * id : SERIAL
+  --
+  * device_id : INT
+  * name : VARCHAR(50)
+  * value : FLOAT
+  * unit : VARCHAR(20)
+  * measured_at : TIMESTAMP WITH TIME ZONE = NOW()
+}
+
+
+device_measurements -- devices : measures >
+@enduml

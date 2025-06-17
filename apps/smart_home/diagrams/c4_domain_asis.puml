@@ -1,0 +1,26 @@
+@startuml
+
+skinparam packageStyle rectangle
+
+skinparam package {
+  FontColor white
+  BorderStyle solid
+  BorderColor blue
+}
+
+skinparam rectangle {
+  BorderColor black
+  BorderStyle dashed
+}
+
+title Domain Map — Тёплый дом - As Is
+
+rectangle "Умный дом\n[Enterprise]" {
+    rectangle "Domain: Управление отоплением\n[System]" {
+        package "«system»\nContext: Мониторинг температуры" #CornflowerBlue {}
+        package "«system»\nContext: Регулирование температуры" #CornflowerBlue{}
+        package "«system»\nContext: Управление датчиками" #CornflowerBlue{}
+    }
+}
+
+@enduml

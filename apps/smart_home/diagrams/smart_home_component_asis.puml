@@ -1,0 +1,39 @@
+@startuml
+
+title SmartHome componet diagram AS-IS
+top to bottom direction
+
+package "main" {
+  [MainApp] as Main
+}
+
+package "handlers" {
+  [SensorHandler]
+}
+
+package "services" {
+  [TemperatureService]
+  interface ExternalTemperatureAPI
+}
+
+package "db" {
+  [Database]
+  interface SensorRepository
+}
+
+package "models" {
+  [SensorModels]
+}
+
+' Связи между компонентами
+Main --> SensorHandler : init + routes
+
+SensorHandler --> TemperatureService : получение температуры
+SensorHandler --> SensorRepository : uses
+Database ..|> SensorRepository : implements
+
+TemperatureService --> ExternalTemperatureAPI : calls HTTP API
+
+Database ..> SensorModels : uses types
+
+@enduml

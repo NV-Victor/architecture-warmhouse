@@ -1,0 +1,47 @@
+@startuml
+
+title MainApp class diagram AS-IS
+top to bottom direction
+
+package "main" {
+  class Main {
+    + main()
+    - getEnv(key: string, defaultValue: string): string
+  }
+}
+
+package "db" {
+  class DB {
+    + New(connString: string): *DB
+    + Close(): error
+  }
+}
+
+package "services" {
+  class TemperatureService {
+    + NewTemperatureService(baseURL: string): *TemperatureService
+  }
+}
+
+package "handlers" {
+  class SensorHandler {
+    + NewSensorHandler(db: *DB, ts: *TemperatureService): *SensorHandler
+    + RegisterRoutes(router: *gin.RouterGroup)
+  }
+}
+
+package "net/http" {
+  class Server {
+    + Addr: string
+    + Handler: http.Handler
+    + ListenAndServe(): error
+    + Shutdown(ctx: context.Context): error
+  }
+}
+
+main.Main --> db.DB : init via New()
+main.Main --> services.TemperatureService : init via NewTemperatureService()
+main.Main --> handlers.SensorHandler : creates and uses
+main.Main --> Server : configures and starts
+
+@enduml

@@ -1,0 +1,18 @@
+@startuml
+title Запрос GET /api/v1/sensors/ для просмотра информации по всем датчикам
+
+actor "Специалист компании Тёплый дом" as User 
+participant "SmartHome" as App
+participant "Sensor (внешний API)" as ExternalSensor
+
+User -> App : GET /api/v1/sensors
+App -> App : Получение всех датчиков из базы данных
+loop по каждому сенсору
+  alt sensor.Type == Temperature
+    App -> ExternalSensor : GET /temperature/:id
+    ExternalSensor --> App : Актуальное состояние и температура по датчику
+  end
+end
+App --> User : Ответ 200 OK со списком датчиков с актуальным состоянием
+
+@enduml

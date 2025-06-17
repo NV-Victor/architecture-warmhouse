@@ -1,0 +1,20 @@
+@startuml
+title Context Diagram - Тёплый дом
+
+top to bottom direction
+
+!include ./C4-PlantUML-Git/C4_Context.puml
+
+Person(user, "Пользователь", "Пользователь, использующий сервисы SmartHome")
+Person(admin, "Администратор", "Сотрудник компании Тёплый дом, управляющий системой SmartHome")
+System(SmartHomeSystem, "SmartHome System", "Система, управляющая удаленными устройствами умного дома")
+
+System_Ext(DeviceAPI, "Device API", "API удаленных устройств")
+System_Ext(Bank, "Bank System", "Банк, для проведения оплат")
+
+Rel(user, SmartHomeSystem, "Использует систему")
+Rel(admin,SmartHomeSystem,"Администрирует систему")
+Rel(SmartHomeSystem,DeviceAPI,"Управляет удаленными устройствами")
+Rel(SmartHomeSystem,Bank,"Обрабатывает платежи")
+
+@enduml

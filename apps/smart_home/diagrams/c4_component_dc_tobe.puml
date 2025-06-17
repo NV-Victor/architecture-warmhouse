@@ -1,0 +1,32 @@
+@startuml
+!include ./C4-PlantUML-Git/C4_Component.puml
+
+
+title Device Service Container Diagram — Тёплый дом - To Be
+
+System_Boundary(SmartHomeSystem, "SmartHome System") {
+
+    Container(DeviceService, "Device Service", "", "Управление состоянием устройств"){
+      Component(DeviceServiceController, "DeviceServiceController", "", "Обрабатывает команды управления устройствами")
+      Component(DeviceServiceLogic, "DeviceServiceLogic", "", "Содержит бизнес-логику управления")
+      Component(DeviceServiceRepository, "DeviceServiceRepository", "", "Доступ к устройствам в базе")
+      Component(IntegrationAdapterClient, "IntegrationAdapterClient", "", "Связывается с физическими устройствами")
+'      Component(KafkaController, "KafkaController", "", "Отправляет события в брокер-сообщений")
+
+      Rel(DeviceServiceController, DeviceServiceLogic, "Запускает бизнес логику", "function call")
+      Rel(DeviceServiceLogic, DeviceServiceRepository, "Записывает/читает информацию об устройствах", "function call")
+      Rel(DeviceServiceLogic, IntegrationAdapterClient, "Отправляет команды на устройства", "function call")
+ '     Rel(DeviceServiceLogic, KafkaController, "Публикует события устройств", "function call")
+  }
+
+  Container(Database, "Database", "PostgreSQL", "Централизованное хранилище данных")
+  Container(IntegrationAdapter, "Integration Adapter", "Go", "Интеграция с внешними устройствами по стандартным протоколам")
+'  Container(EventBroker, "Event Broker", "Kafka", "Передача событий между сервисами")
+
+  Rel(DeviceServiceRepository, Database, "Читает/записывает данные", "SQL")
+  Rel(IntegrationAdapterClient, IntegrationAdapter, "Отправляет команды и обрабатывает ответы", "HTTP")
+'  Rel(KafkaController, EventBroker, "Публикует события устройств", "")
+
+}
+
+@enduml

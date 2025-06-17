@@ -1,0 +1,34 @@
+@startuml
+!include ./C4-PlantUML-Git/C4_Component.puml
+
+title API Gateway Container Diagram — Тёплый дом - To Be
+
+System_Boundary(SmartHomeSystem, "SmartHome System") {
+
+    Container(APIGateway, "API Gateway", "Nginx", "Маршрутизация запросов к нужным сервисам"){
+'      Component(AuthProxy, "AuthProxy", "", "Проксирует запросы на сервис авторизации")
+      Component(DeviceServiceProxy, "DeviceServiceProxy", "", "Проксирует запросы на Device Service")
+'      Component(ScenarioServiceProxy, "ScenarioServiceProxy", "", "Проксирует запросы на Scenario Service")
+'      Component(TelemetryServiceProxy, "TelemetryServiceProxy", "", "Проксирует запросы на Telemetry Service")
+'      Component(SubscriptionServiceProxy, "SubscriptionServiceProxy", "", "Проксирует запросы на Subscription Service")
+'      Component(PaymentProxy, "PaymentProxy", "", "Проксирует запросы на Payment Service")
+      Component(SmartHomeMainAppProxy, "SmartHomeMainAppProxy", "", "Проксирует запросы на SmartHome Main App")
+  }
+
+  Container(DeviceService, "Device Service", "Go", "Управление состоянием устройств")
+'  Container(ScenarioService, "Scenario Service", "", "Создание и исполнение сценариев")
+'  Container(TelemetryService, "Telemetry Service", "", "Сбор и отображение телеметрии")
+'  Container(SubscriptionService, "Subscription Service", "", "Управление пользователями и подписками")
+'  Container(PaymentService, "Payment Service", "", "Обработка платежей за подписку и журнал транзакций")
+  Container(SmartHomeMainApp, "SmartHome Main App", "Go", "Текущее монолитное приложение SmartHome для отопления")
+  
+'  Rel(AuthProxy, SubscriptionService, "", "")
+  Rel(DeviceServiceProxy, DeviceService, "/api/v1/devices", "HTTP")
+'  Rel(ScenarioServiceProxy, ScenarioService, "", "")
+'  Rel(TelemetryServiceProxy, TelemetryService, "", "")
+'  Rel(SubscriptionServiceProxy, SubscriptionService, "", "")
+'  Rel(PaymentProxy, PaymentService, "", "")
+  Rel(SmartHomeMainAppProxy, SmartHomeMainApp, "/api/v1/sensors", "HTTP")
+}
+
+@enduml
