@@ -1,6 +1,6 @@
 @startuml
 
-title SmartHome componet diagram AS-IS
+title SmartHome componet diagram AS-IS TEST WF
 top to bottom direction
 
 package "main" {
