@@ -3,7 +3,7 @@ name: Generate PlantUML Diagrams
 on:
   push:
     paths:
-      - '**.puml'
+      - 'apps/smart_home/diagrams/**/*.puml'
       - '.github/workflows/plantuml.yml'
 
 permissions:
@@ -33,11 +33,11 @@ jobs:
 
       - name: Generate diagrams
         run: |
-          mkdir -p img
-          find . -name '*.puml' | while read file; do
+          mkdir -p apps/smart_home/diagrams/img
+          find apps/smart_home/diagrams -maxdepth 1 -name '*.puml' | while read file; do
             name=$(basename "$file" .puml)
             java -jar plantuml.jar "$file"
-            mv "${file%.puml}.png" "img/$name.png" || echo "No output for $file"
+            mv "${file%.puml}.png" "apps/smart_home/diagrams/img/$name.png" || echo "No output for $file"
           done
 
       - name: Commit changes
@@ -47,7 +47,7 @@ jobs:
           git fetch origin
           git checkout ${{ github.ref_name }}
           git pull --rebase origin ${{ github.ref_name }}
-          git add img/*.png
+          git add apps/smart_home/diagrams/img/*.png
           git commit -m "Auto-generated PlantUML diagrams" || echo "No changes to commit"
 
       - name: Push changes back to current branch
