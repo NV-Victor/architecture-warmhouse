@@ -312,57 +312,100 @@ API Gateway, Integration Adapter не имеют под собой бизнес-
 
 # Задание 5. Работа с docker и docker-compose
 
-Перейдите в apps.
+1. В рамках данного задания было сделано приложение temperature-api, написанное на pyhton. Для приложения был добавлен свой Dockerfile и requirements.
+2. После этого был изменен файл docker-compose.yaml:
+   1. В блок с контейнером postgres добавлены переменные окружения, сеть, автоматическия запуск файла init.sql, healthcheck, переименован том postgres-data в postgres-data-smarthome (были конфликты с предыдущими уроками)
+   2. Добавлен блок с контейнером temperature-api с портом 8081 и соответствующей сетью
+   3. В блок с app добавлена сеть, добавлены переменные окружения
+3. Дополнительно изменил `temperature_service.go`, чтобы он корректно вызвал location с пробелом.
+4. Добавил workflow для github с автоматической генерацией png диаграмм puml.
 
-Там находится приложение-монолит для работы с датчиками температуры. В README.md описано как запустить решение.
+При запуске контейнеров через docker-compose.yaml (`docker-compose up --build`) может быть небольшая задержка с запуском smarthome-app из-за ожидания поднятия smarthome-postgres (ожидание может быть до одной минуты).
 
-Вам нужно:
+Проверять можно используя Postman коллекцию [smarthome-api.postman_collection.json](./apps/smarthome-api.postman_collection.json)
 
-1) сделать простое приложение temperature-api на любом удобном для вас языке программирования, которое при запросе /temperature?location= будет отдавать рандомное значение температуры.
-
-Locations - название комнаты, sensorId - идентификатор названия комнаты
-
-```
-	// If no location is provided, use a default based on sensor ID
-	if location == "" {
-		switch sensorID {
-		case "1":
-			location = "Living Room"
-		case "2":
-			location = "Bedroom"
-		case "3":
-			location = "Kitchen"
-		default:
-			location = "Unknown"
-		}
-	}
-
-	// If no sensor ID is provided, generate one based on location
-	if sensorID == "" {
-		switch location {
-		case "Living Room":
-			sensorID = "1"
-		case "Bedroom":
-			sensorID = "2"
-		case "Kitchen":
-			sensorID = "3"
-		default:
-			sensorID = "0"
-		}
-	}
+## Проверка работоспособности методов
+### Health Check
+```curl 
+curl --location 'http://localhost:8080/health'
 ```
 
-2) Приложение следует упаковать в Docker и добавить в docker-compose. Порт по умолчанию должен быть 8081
+```json
+{"status":"ok"}
+```
+### Create Sensor
+```curl 
+curl --location 'http://localhost:8080/api/v1/sensors' \
+--header 'Content-Type: application/json' \
+--data '{
+    "name": "Living Room Temperature",
+    "type": "temperature",
+    "location": "Living Room",
+    "unit": "°C"
+}'
+```
 
-3) Кроме того для smart_home приложения требуется база данных - добавьте в docker-compose файл настройки для запуска postgres с указанием скрипта инициализации ./smart_home/init.sql
+```json
+{"id":1,"name":"Living Room Temperature","type":"temperature","location":"Living Room","value":0,"unit":"°C","status":"inactive","last_updated":"2025-06-18T18:21:14.624846Z","created_at":"2025-06-18T18:21:14.624846Z"}
+```
 
-Для проверки можно использовать Postman коллекцию smarthome-api.postman_collection.json и вызвать:
+### Update Sensor
+```curl 
+curl --location --request PUT 'http://localhost:8080/api/v1/sensors/1' \
+--header 'Content-Type: application/json' \
+--data '{
+    "name": "Updated Living Room Temperature",
+    "type": "temperature",
+    "location": "Living Room",
+    "unit": "°C"
+}'
+```
 
-- Create Sensor
-- Get All Sensors
+```json
+{"id":1,"name":"Updated Living Room Temperature","type":"temperature","location":"Living Room","value":22.5,"unit":"°C","status":"active","last_updated":"2025-06-18T18:24:44.583761Z","created_at":"2025-06-18T18:21:14.624846Z"}
+```
+### Update Sensor Value
+```curl 
+curl --location --request PATCH 'http://localhost:8080/api/v1/sensors/1/value' \
+--header 'Content-Type: application/json' \
+--data '{
+    "value": 22.5,
+    "status": "active"
+}'
+```
 
-Должно при каждом вызове отображаться разное значение температуры
+```json
+{"message":"Sensor value updated successfully"}
+```
+### Get All Sensors
+```curl 
+curl --location 'http://localhost:8080/api/v1/sensors'
+```
 
-Ревьюер будет проверять точно так же.
+```json
+[{"id":1,"name":"Updated Living Room Temperature","type":"temperature","location":"Living Room","value":18.7,"unit":"°C","status":"active","last_updated":"2025-06-18T18:25:15.148633Z","created_at":"2025-06-18T18:21:14.624846Z"}]
+```
+### Get Sensor by ID
+```curl 
+curl --location 'http://localhost:8080/api/v1/sensors/1'
+```
 
+```json
+{"id":1,"name":"Updated Living Room Temperature","type":"temperature","location":"Living Room","value":23.49,"unit":"°C","status":"active","last_updated":"2025-06-18T18:25:49.691911Z","created_at":"2025-06-18T18:21:14.624846Z"}
+```
+### Get Sensor by Location
+```curl 
+curl --location 'http://localhost:8080/api/v1/sensors/temperature/Living%20Room'
+```
 
+```json
+{"description":"Temperature sensor reading by location","location":"Living Room","status":"active","timestamp":"2025-06-18T19:05:39.567114Z","unit":"C","value":21.9}
+```
+### Delete Sensor
+```curl 
+curl --location --request DELETE 'http://localhost:8080/api/v1/sensors/1'
+```
+
+```json
+{"message":"Sensor deleted successfully"}
+```

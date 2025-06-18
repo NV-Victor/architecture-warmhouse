@@ -9,7 +9,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
-      - ./smart_home/init.sql:/docker-entrypoint-initdb.d/smart_home/init.sql
+      - ./smart_home/init.sql:/docker-entrypoint-initdb.d/init.sql
       - postgres-data-smarthome:/var/lib/postgresql/data
     ports:
       - "5432:5432"
