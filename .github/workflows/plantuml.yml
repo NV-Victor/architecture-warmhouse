@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}  # Загружаем именно ту ветку
 
       - name: Set up Java
         uses: actions/setup-java@v3
@@ -27,10 +29,9 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y graphviz
 
       - name: Download PlantUML
-        run: |
-          curl -L https://github.com/plantuml/plantuml/releases/latest/download/plantuml.jar -o plantuml.jar
+        run: curl -L https://github.com/plantuml/plantuml/releases/latest/download/plantuml.jar -o plantuml.jar
 
-      - name: Generate diagrams and move to img/
+      - name: Generate diagrams
         run: |
           mkdir -p img
           find . -name '*.puml' | while read file; do
@@ -43,10 +44,12 @@ jobs:
         run: |
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
+          git fetch origin ${{ github.ref_name }}
+          git pull --rebase origin ${{ github.ref_name }}
           git add img/*.png
           git commit -m "Auto-generated PlantUML diagrams" || echo "No changes to commit"
 
-      - name: Push to GitHub
+      - name: Push changes
         uses: ad-m/github-push-action@v0.6.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
