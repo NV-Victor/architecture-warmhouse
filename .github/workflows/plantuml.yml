@@ -9,6 +9,7 @@ on:
 jobs:
   render-diagrams:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -19,17 +20,20 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Install Graphviz
+        run: sudo apt-get update && sudo apt-get install -y graphviz
+
       - name: Download PlantUML
         run: |
           curl -L https://github.com/plantuml/plantuml/releases/latest/download/plantuml.jar -o plantuml.jar
 
-      - name: Generate diagrams
+      - name: Generate diagrams and move to img/
         run: |
           mkdir -p img
           find . -name '*.puml' | while read file; do
             name=$(basename "$file" .puml)
-            java -jar plantuml.jar -tpng "$file"
-            mv "${file%.puml}.png" "img/$name.png"
+            java -jar plantuml.jar "$file"
+            mv "${file%.puml}.png" "img/$name.png" || echo "No output for $file"
           done
 
       - name: Commit and push generated images
