@@ -1,0 +1,56 @@
+name: Generate PlantUML Diagrams
+
+on:
+  push:
+    paths:
+      - 'apps/smart_home/diagrams/**/*.puml'
+      - '.github/workflows/plantuml.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  render-diagrams:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout current branch
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install Graphviz
+        run: sudo apt-get update && sudo apt-get install -y graphviz
+
+      - name: Download PlantUML
+        run: curl -L https://github.com/plantuml/plantuml/releases/latest/download/plantuml.jar -o plantuml.jar
+
+      - name: Generate diagrams to ./apps/smart_home/diagrams/img/
+        run: |
+          mkdir -p apps/smart_home/diagrams/img
+          find apps/smart_home/diagrams -maxdepth 1 -name '*.puml' | while read file; do
+            name=$(basename "$file" .puml)
+            java -jar plantuml.jar "$file"
+            mv "${file%.puml}.png" "apps/smart_home/diagrams/img/$name.png" || echo "No output for $file"
+          done
+
+      - name: Commit changes
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
+          git add apps/smart_home/diagrams/img/*.png
+          git commit -m "Auto-generated PlantUML diagrams" || echo "No changes to commit"
+          git fetch origin
+          git pull --rebase origin ${{ github.ref_name }}
+
+      - name: Push changes back to same branch
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git push https://x-access-token:${TOKEN}@github.com/${{ github.repository }} HEAD:${{ github.ref_name }}
