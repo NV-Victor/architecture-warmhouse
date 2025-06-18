@@ -1,0 +1,47 @@
+name: PlantUML Diagrams
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  generate-diagrams:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Download PlantUML .jar
+        run: curl -L -o plantuml.jar https://github.com/plantuml/plantuml/releases/latest/download/plantuml.jar
+
+      - name: Create img directory if not exists
+        run: mkdir -p img
+
+        - name: Generate Diagrams
+        run: |
+          find . -name '*.puml' | while read file; do
+            name=$(basename "$file" .puml)
+            java -jar plantuml.jar "$file" -tpng
+            mv "${file%.puml}.png" "img/$name.png"
+          done
+
+      - name: Commit and Push Diagrams
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Automated diagram generation"
+          branch: main
+          file_pattern: img/*.png
+          commit_user_name: github-actions[bot]
+          commit_user_email: github-actions[bot]@users.noreply.github.com
+          token: ${{ secrets.GITHUB_TOKEN }}
