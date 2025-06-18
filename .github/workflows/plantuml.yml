@@ -6,6 +6,9 @@ on:
       - '**.puml'
       - '.github/workflows/plantuml.yml'
 
+permissions:
+  contents: write
+
 jobs:
   render-diagrams:
     runs-on: ubuntu-latest
@@ -36,10 +39,14 @@ jobs:
             mv "${file%.puml}.png" "img/$name.png" || echo "No output for $file"
           done
 
-      - name: Commit and push generated images
+      - name: Commit changes
         run: |
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
           git add img/*.png
           git commit -m "Auto-generated PlantUML diagrams" || echo "No changes to commit"
-          git push
+
+      - name: Push to GitHub
+        uses: ad-m/github-push-action@v0.6.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
